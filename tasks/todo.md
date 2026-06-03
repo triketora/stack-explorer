@@ -3,39 +3,54 @@
 Branch: `build-stack-explorer`. Execution mode: subagent-driven (implementer → spec review → quality review per task).
 
 ## Phase 1 — Analysis Engine
-- [ ] P1.1 Scaffold Next.js + TS
-- [ ] P1.2 Add test + lib deps (vitest, zod, picomatch, anthropic)
-- [ ] P1.3 Analysis types + zod schemas
-- [ ] P1.4 buildFileTree
-- [ ] P1.5 applyGlobs / deriveFiles
-- [ ] P1.6 Static tech registry
-- [ ] P1.7 Manifest parsers
-- [ ] P1.8 Detection orchestrator
+- [x] P1.1 Scaffold Next.js + TS (verified: tsc clean, build OK)
+- [x] P1.2 Add test + lib deps (vitest, zod, picomatch, anthropic)
+- [x] P1.3 Analysis types + zod schemas (verified)
+- [x] P1.4 buildFileTree (verified)
+- [x] P1.5 applyGlobs / deriveFiles (verified)
+- [x] P1.6 Static tech registry (verified)
+- [x] P1.7 Manifest parsers (verified)
+- [x] P1.8 Detection orchestrator (verified) — Phase 1 COMPLETE, 12/12 tests pass
 
 ## Phase 2 — App + Pipeline
-- [ ] P2.1 Client file filter/classifier
-- [ ] P2.2 Analyze request contract
-- [ ] P2.3 Static fallback Analysis builder
-- [ ] P2.4 Enrichment prompt builder
-- [ ] P2.5 Enrichment orchestrator
-- [ ] P2.6 Anthropic adapter
-- [ ] P2.7 /api/analyze route
-- [ ] P2.8 FolderPicker
-- [ ] P2.9 End-to-end page (raw render)
-- [ ] P2.10 E2E pipeline test (mocked model)
+- [x] P2.1 Client file filter/classifier (verified)
+- [x] P2.2 Analyze request contract (verified)
+- [x] P2.3 Static fallback Analysis builder (verified)
+- [x] P2.4 Enrichment prompt builder (verified)
+- [x] P2.5 Enrichment orchestrator (verified)
+- [x] P2.6 Anthropic adapter (verified)
+- [x] P2.7 /api/analyze route (verified)
+- [x] P2.8 FolderPicker (verified)
+- [x] P2.9 End-to-end page (raw render) (verified)
+- [x] P2.10 E2E pipeline test (mocked model) (verified) — Phase 2 COMPLETE, 24 tests, build OK
+      note: vitest.config include extended with app/**/*.test.ts (plan gap, fixed)
 
 ## Phase 3 — Visualization UI
-- [ ] P3.1 Port styles + fonts
-- [ ] P3.2 Icon
-- [ ] P3.3 diagram-types + StackNode
-- [ ] P3.4 EdgeLayer
-- [ ] P3.5 Tier + Diagram
-- [ ] P3.6 Drilldown panel + preview
-- [ ] P3.7 FileTreePane
-- [ ] P3.8 TopBar + EntryScreen
-- [ ] P3.9 App shell wiring + trace
-- [ ] P3.10 Trace caption style + visual verify
-- [ ] P3.11 Render deploy config
+- [x] P3.1 Port styles + fonts (verified)
+- [x] P3.2 Icon (verified)
+- [x] P3.3 diagram-types + StackNode (verified)
+- [x] P3.4 EdgeLayer (verified)
+- [x] P3.5 Tier + Diagram (verified)
+- [x] P3.6 Drilldown panel + preview (verified)
+- [x] P3.7 FileTreePane (verified)
+- [x] P3.8 TopBar + EntryScreen (verified)
+- [x] P3.9 App shell wiring + trace (verified)
+- [x] P3.10 Trace caption style + visual verify (verified — see review log)
+- [x] P3.11 Render deploy config (verified)
 
 ## Review log
-(filled as tasks complete)
+- Phases 1–2: 24 unit/e2e tests pass; tsc clean; production build succeeds; /api/analyze is a dynamic route.
+- Per-batch spec + quality review done by controller (code verbatim from reviewed plans).
+- Visual verification (Playwright, sample Analysis via temp page, now removed):
+  - Entry screen: themed card + IBM Plex fonts + drop zone ✓
+  - Architecture: layered tiers, node cards w/ "N alt" badges, selected-path edges, compare panel
+    (rationale, maps-to-code, alternatives w/ pros/cons/when) ✓
+  - Codebase map: split diagram + file tree, map-count badges, bidirectional cross-highlight ✓
+- Trace mode wired (auto-advancing stepper + caption); verified by code + tsc (not screenshotted).
+- Known notes:
+  - vitest.config include extended with app/**/*.test.ts (plan gap, fixed).
+  - .gitignore: added !.env.example exception.
+  - Git history was flattened during scaffold (cp -R replaced .git); all content preserved.
+  - LLM path not exercised end-to-end (no ANTHROPIC_API_KEY in env); static fallback path + all
+    components verified. User should smoke-test with a real key.
+  - Ported styles.css retains dead CSS for dropped features (flow/nested/tweaks) — harmless.
