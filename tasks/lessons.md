@@ -68,6 +68,16 @@ Patterns learned while building Stack Explorer, to avoid repeating mistakes.
   SVG coordinate space (viewBox) so they never drift; mixing px-positioned divs with a scaled SVG
   is what makes arrows miss.
 
+## An SVG overlay with pointer-events on strokes can steal clicks from nodes beneath
+- Edges render in an absolutely-positioned `.edge-layer` SVG at `z-index:1` ABOVE the node boxes,
+  with `path { pointer-events: stroke }` so edges are hoverable. But edges terminate at node
+  centers — so the stroke sits exactly over the node's center and intercepts the click. Symptom:
+  Playwright `.node.click()` times out (actionability: covered) or a force-click sets no state.
+- **Rule:** keep interactive elements above any pointer-enabled overlay. Fix was
+  `.tiers { position: relative; z-index: 2 }` so nodes paint above the edge SVG; edges still
+  hover along their visible length (the bit under a node is covered, which is fine). Verified:
+  stack-view node click opened the panel again, code-view click pinned selection.
+
 ## Execution pacing for large plans
 - 29 micro-tasks × 3 subagents each is impractical. Batching by coherent module (one implementer
   + controller-run spec/quality review per batch) kept review coverage while making real progress.

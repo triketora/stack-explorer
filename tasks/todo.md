@@ -73,3 +73,12 @@ Branch: `build-stack-explorer`. Execution mode: subagent-driven (implementer →
 - [x] Interactive "data flow" legend (hover-all, click-pin, reciprocal edge→label); "selected path" → "selected connections" (only when selected)
 - [x] Entry data-disclosure note (expandable "What's sent?")
 - Verified live: Stack 8 clusters/16 links, System 9 nodes/10 edges, code overlay width unchanged, disclosure expands. 35 tests, build+tsc clean.
+
+## Diagram refinements (2026-06-03b) — COMPLETE
+- [x] Lighter default edges (hair-2, tucked behind nodes); darken on hover/pin/selection
+- [x] Curation: overview prompt keeps only significant tech; per-cluster cap (5) + "+N more" (lib/stack/cluster.ts)
+- [x] Dev & Testing tier (devtest, idx 05), muted; registry vite/github-actions + fallback ordering
+- [x] Code view: node/file click = persistent selection (pinnedNodeId), no compare panel
+- [x] Fix: raised .tiers z-index so edge SVG (pointer-events:stroke) no longer steals node clicks
+- Verified live: tiers incl muted Dev & Test, pin emphasizes all edges, stack click opens panel,
+  code click pins (no panel) + highlights files. 40 tests, build+tsc clean.

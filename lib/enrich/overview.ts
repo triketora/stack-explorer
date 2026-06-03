@@ -15,8 +15,8 @@ Return ONLY a JSON object with this exact shape:
 {
   "repo": string,
   "langs": string,                      // e.g. "Python · TypeScript · SQL"
-  "tiers": [                            // ordered: client, api, data, infra (omit empty tiers)
-    { "id": "client"|"api"|"data"|"infra", "idx": "01".."04", "name": string, "desc": string,
+  "tiers": [                            // ordered: client, api, data, infra, devtest (omit empty tiers)
+    { "id": "client"|"api"|"data"|"infra"|"devtest", "idx": "01".."05", "name": string, "desc": string,
       "nodes": [
         { "id": string, "name": string, "cat": string, "glyph": string (<=2 chars),
           "tags": string[], "rationale": string (why this choice; 1-3 sentences),
@@ -34,6 +34,11 @@ Return ONLY a JSON object with this exact shape:
 
 Rules:
 - Use the provided detected technologies as ground truth; add inferred ones (mark confidence "inferred").
+- CURATE: include only architecturally SIGNIFICANT technologies. Omit minor/transitive
+  dependencies, small utilities, plugins, polyfills, and type stubs. Aim for the meaningful stack a
+  staff engineer would name — favor removing noise over completeness. Keep clusters small.
+- Put build/lint/test/CI/dev tooling (bundlers, linters, formatters, test frameworks, CI) in the
+  "devtest" tier — NOT in client/infra. Give those nodes kind "buildtool".
 - pathGlobs MUST reference real paths/dirs from the provided tree.
 - Do NOT include "alts"/alternatives, a "fileTree", or per-node "files" — those are handled separately.
 - Output raw JSON only — no markdown fences, no commentary.`;

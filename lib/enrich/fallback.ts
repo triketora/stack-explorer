@@ -4,12 +4,13 @@ import type { AnalyzeRequest } from "@/lib/analyze-contract";
 import { buildFileTree } from "@/lib/filetree";
 
 const TIER_META: Record<string, { idx: string; name: string; desc: string }> = {
-  client: { idx: "01", name: "Client", desc: "browser-side application" },
-  api:    { idx: "02", name: "Application / API", desc: "request handling & business logic" },
-  data:   { idx: "03", name: "Data", desc: "persistence, cache & storage" },
-  infra:  { idx: "04", name: "Delivery & Infra", desc: "build, ship & run" },
+  client:  { idx: "01", name: "Client", desc: "browser-side application" },
+  api:     { idx: "02", name: "Application / API", desc: "request handling & business logic" },
+  data:    { idx: "03", name: "Data", desc: "persistence, cache & storage" },
+  infra:   { idx: "04", name: "Delivery & Infra", desc: "build, ship & run" },
+  devtest: { idx: "05", name: "Dev & Testing", desc: "build, lint, test & CI tooling" },
 };
-const ORDER = ["client", "api", "data", "infra"];
+const ORDER = ["client", "api", "data", "infra", "devtest"];
 
 export function buildFallbackAnalysis(req: AnalyzeRequest, detected: DetectedTech[]): Analysis {
   const tiersById = new Map<string, Tier>();

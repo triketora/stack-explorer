@@ -19,6 +19,7 @@ export default function Home() {
   const [view, setView] = useState<View>("stack");
   const [activeNode, setActiveNode] = useState<Technology | null>(null);
   const [hoverNodeId, setHoverNodeId] = useState<string | null>(null);
+  const [pinnedNodeId, setPinnedNodeId] = useState<string | null>(null);  // Code view selection
   const [fileMaps, setFileMaps] = useState<string[] | null>(null);
   const [traceStep, setTraceStep] = useState<number | null>(null);
   const [bump, setBump] = useState(0);
@@ -34,6 +35,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => { setBump((b) => b + 1); }, [view, analysis]);
+  useEffect(() => { setPinnedNodeId(null); }, [view]);   // selection is per-view (Code view)
 
   useEffect(() => {
     const h = (e: KeyboardEvent) => { if (e.key === "Escape") { setActiveNode(null); setTraceStep(null); } };
@@ -65,11 +67,21 @@ export default function Home() {
     });
   }
 
+  // In Code view a click pins a persistent selection (drives cross-highlight) and does NOT
+  // open the compare panel; in Stack/System it opens the panel as usual.
+  function handleNodeClick(n: Technology) {
+    if (view === "code") setPinnedNodeId((cur) => (cur === n.id ? null : n.id));
+    else openNode(n);
+  }
+
+  // selected node id for highlighting purposes (panel-independent in Code view)
+  const selectedId = view === "code" ? pinnedNodeId : (activeNode ? activeNode.id : null);
+
   const common: DiagramCommon = {
-    activeId: traceNodeId ?? (activeNode ? activeNode.id : null),
+    activeId: traceNodeId ?? selectedId,
     fileHits: fileMaps ? new Set(fileMaps) : null,
     mapDim: view === "code" && !!fileMaps,
-    onClick: openNode,
+    onClick: handleNodeClick,
     onHover: setHoverNodeId,
     registerNode,
   };
@@ -82,7 +94,7 @@ export default function Home() {
     onEdgeHover: (on) => setLegendHot(on),
   };
 
-  const focusId = hoverNodeId ?? (activeNode ? activeNode.id : null);
+  const focusId = hoverNodeId ?? selectedId;
   const focusName = focusId ? analysis.tiers.flatMap((t) => t.nodes).find((n) => n.id === focusId)?.name ?? null : null;
   const activeAlt = activeNode ? altStateFor(activeNode.id) : { status: "idle" as const, alts: [] };
 
@@ -93,6 +105,8 @@ export default function Home() {
   function onClickFile(f: TreeNodeData) {
     const id = f.maps?.[0];
     if (!id) return;
+    // In Code view, clicking a file pins the selection (no panel). Elsewhere, open the panel.
+    if (view === "code") { setPinnedNodeId((cur) => (cur === id ? null : id)); return; }
     const node = analysis!.tiers.flatMap((t) => t.nodes).find((n) => n.id === id);
     if (node) openNode(node);
   }
@@ -101,7 +115,7 @@ export default function Home() {
     <div className="app">
       <TopBar analysis={analysis} view={view} onView={setView}
         onTrace={startTrace} tracing={traceStep !== null}
-        onReset={() => { reset(); setActiveNode(null); setView("stack"); setTraceStep(null); }} />
+        onReset={() => { reset(); setActiveNode(null); setPinnedNodeId(null); setView("stack"); setTraceStep(null); }} />
 
       <div className="work">
         <div className="canvas-wrap">

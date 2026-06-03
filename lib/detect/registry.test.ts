@@ -6,7 +6,7 @@ describe("registry", () => {
     for (const [id, meta] of Object.entries(REGISTRY)) {
       expect(meta.name, id).toBeTruthy();
       expect(meta.glyph.length, id).toBeLessThanOrEqual(2);
-      expect(["client", "api", "data", "infra"]).toContain(meta.tier);
+      expect(["client", "api", "data", "infra", "devtest"]).toContain(meta.tier);
     }
   });
   it("looks up a known tech", () => {

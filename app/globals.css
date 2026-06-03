@@ -722,3 +722,29 @@ html, body {
 /* entry disclosure */
 .disclosure { margin-top: 14px; font-size: 12px; color: var(--ink-2); }
 .disclosure-detail { margin-top: 8px; font-size: 12px; line-height: 1.55; color: var(--ink-2); background: var(--surface-2); padding: 10px; border-radius: 8px; }
+
+/* ===== diagram refinements (2026-06-03b) ================================= */
+
+/* lighter data-flow edges by default; darken on hover-emphasis / selection */
+.edge-layer path { stroke: var(--hair-2); }
+.edge-layer path.all { stroke: var(--accent-edge); }
+.edge-layer path.hot { stroke: var(--accent); }
+.edge-layer path.dim { opacity: .12; }
+.sys-edge { stroke: var(--hair-2); }
+
+/* de-emphasized Dev & Testing tier */
+.tier.muted { opacity: .66; transition: opacity .15s; }
+.tier.muted:hover { opacity: 1; }
+.tier.muted .tier-label .name { color: var(--ink-2); font-weight: 500; }
+.tier.muted .node { box-shadow: none; }
+
+/* "+N more" cluster expand chip */
+.cluster-more {
+  align-self: center; height: var(--node-h);
+  border: 1px dashed var(--hair); background: none; color: var(--ink-3);
+  font-size: 11px; border-radius: var(--radius); padding: 0 12px; cursor: pointer;
+}
+.cluster-more:hover { color: var(--accent-ink); border-color: var(--accent-edge); background: var(--accent-wash); }
+
+/* keep tiers/nodes above the edge layer so node centers (where edges terminate) stay clickable */
+.tiers { position: relative; z-index: 2; }
