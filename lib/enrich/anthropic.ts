@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import type { CallModel } from "@/lib/enrich";
+import type { CallModel } from "@/lib/enrich/model";
 
 export const callAnthropic: CallModel = async (system, user) => {
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });

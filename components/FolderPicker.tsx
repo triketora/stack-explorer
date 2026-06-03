@@ -2,14 +2,14 @@
 
 import { useRef, useState } from "react";
 import { shouldIgnore, classify, MAX_MANIFEST_BYTES } from "@/client/filter";
-import type { Analysis } from "@/lib/types";
+import type { AnalyzeRequest } from "@/lib/analyze-contract";
 
 interface Props {
-  onAnalyzed: (analysis: Analysis, files: Map<string, File>) => void;
+  onPicked: (req: AnalyzeRequest, files: Map<string, File>) => void;
   onError: (message: string) => void;
 }
 
-export function FolderPicker({ onAnalyzed, onError }: Props) {
+export function FolderPicker({ onPicked, onError }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
 
@@ -33,16 +33,9 @@ export function FolderPicker({ onAnalyzed, onError }: Props) {
         }
       }
 
-      const res = await fetch("/api/analyze", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ repo, manifests, tree }),
-      });
-      if (!res.ok) throw new Error(`analyze failed (${res.status})`);
-      const analysis: Analysis = await res.json();
-      onAnalyzed(analysis, handles);
+      onPicked({ repo, manifests, tree }, handles);
     } catch (e) {
-      onError(e instanceof Error ? e.message : "analysis failed");
+      onError(e instanceof Error ? e.message : "could not read folder");
     } finally {
       setBusy(false);
     }
@@ -50,7 +43,7 @@ export function FolderPicker({ onAnalyzed, onError }: Props) {
 
   return (
     <div className="drop" onClick={() => inputRef.current?.click()}>
-      {busy ? <span>analyzing…</span> : <span>drop a folder here, or click to choose a directory ↵</span>}
+      {busy ? <span>reading files…</span> : <span>drop a folder here, or click to choose a directory ↵</span>}
       <input
         ref={inputRef}
         type="file"

@@ -14,12 +14,12 @@ export function StackNode({ node, active, dim, filehit, onClick, onHover, regist
   return (
     <button
       ref={(el) => registerNode(node.id, el)}
-      className={"node" + (active ? " active" : "") + (dim ? " dim" : "") + (filehit ? " filehit" : "")}
+      className={"node" + (active ? " active" : "") + (dim ? " dim" : "") + (filehit ? " filehit" : "") + (node.pending ? " pending" : "")}
       onClick={() => onClick(node)}
       onMouseEnter={() => onHover(node.id)}
       onMouseLeave={() => onHover(null)}
     >
-      <span className="alt-count mono">{node.alts.length} alt</span>
+      <span className="alt-count mono">{node.alts.length > 0 ? `${node.alts.length} alt` : "compare"}</span>
       <span className="nrow">
         <span className="glyph">{node.glyph}</span>
         <span>

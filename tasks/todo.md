@@ -54,3 +54,13 @@ Branch: `build-stack-explorer`. Execution mode: subagent-driven (implementer →
   - LLM path not exercised end-to-end (no ANTHROPIC_API_KEY in env); static fallback path + all
     components verified. User should smoke-test with a real key.
   - Ported styles.css retains dead CSS for dropped features (flow/nested/tweaks) — harmless.
+
+## Progressive generation (follow-up feature) — COMPLETE
+- [x] Spec + approved design (docs/superpowers/specs/2026-06-02-progressive-generation-design.md)
+- [x] Client-side instant skeleton (client/skeleton.ts)
+- [x] Tree summarizer to bound prompt size (lib/enrich/tree-summary.ts)
+- [x] Overview stage — LLM call WITHOUT alternatives (lib/enrich/overview.ts, /api/overview)
+- [x] Lazy alternatives stage (lib/enrich/alternatives.ts, /api/alternatives) + idle prefetch pool(2)
+- [x] Staged orchestration hook (client/useAnalysis.ts) + ProgressBanner + pending styling + alt states
+- [x] Removed old single-call /api/analyze + enrich/{prompt,index}
+- Verified live: overview ~78s → ~24s; skeleton <1s; alternatives ~14s (prefetched). 31 tests, build clean, tsc clean.

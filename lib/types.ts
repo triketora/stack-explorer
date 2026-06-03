@@ -21,6 +21,7 @@ export const TechnologySchema = z.object({
   confidence: z.enum(["detected", "inferred"]).optional(),
   alts: z.array(AlternativeSchema),
   tier: z.string().optional(),
+  pending: z.boolean().optional(),   // UI-only: skeleton/not-yet-enriched styling
 });
 
 export const TierSchema = z.object({

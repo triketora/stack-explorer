@@ -1,16 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import type { Technology } from "@/lib/types";
+import type { Technology, Alternative } from "@/lib/types";
 import { Icon } from "@/components/Icon";
 
 interface Props {
   node: Technology | null;
   fileHandles: Map<string, File>;
+  alts: Alternative[];
+  altStatus: "idle" | "loading" | "ready" | "error";
+  onRetryAlts: () => void;
   onClose: () => void;
 }
 
-export function Drilldown({ node, fileHandles, onClose }: Props) {
+export function Drilldown({ node, fileHandles, alts, altStatus, onRetryAlts, onClose }: Props) {
   const open = !!node;
   const [preview, setPreview] = useState<{ path: string; text: string } | null>(null);
 
@@ -71,7 +74,17 @@ export function Drilldown({ node, fileHandles, onClose }: Props) {
                 <div className="alt-blurb">{node.rationale}</div>
               </div>
 
-              {node.alts.map((a) => (
+              {(altStatus === "loading" || altStatus === "idle") && (
+                <div className="alt-loading mono">finding alternatives…</div>
+              )}
+              {altStatus === "error" && (
+                <div className="alt-error">
+                  couldn&apos;t load alternatives.{" "}
+                  <button className="link-btn" onClick={onRetryAlts}>Retry</button>
+                </div>
+              )}
+
+              {alts.map((a) => (
                 <div key={a.name} className="alt">
                   <div className="alt-head"><span className="alt-name">{a.name}<span className="mono-mini">{a.tag}</span></span></div>
                   <div className="alt-blurb">{a.blurb}</div>

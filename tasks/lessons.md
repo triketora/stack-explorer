@@ -31,6 +31,27 @@ Patterns learned while building Stack Explorer, to avoid repeating mistakes.
   from the **project root** (so `import 'playwright'` resolves); `npx playwright install chromium`
   for the browser binary.
 
+## Next 15 route files: only export handlers + config, or `tsc` breaks
+- Exporting an arbitrary helper (e.g. `overviewRequest`) from `app/api/.../route.ts` makes
+  `next build` pass BUT a standalone `npx tsc --noEmit` (which includes generated
+  `.next/types/**`) fails: "incompatible with index signature 'never'". Next's generated route
+  validator only allows `GET/POST/...` + `runtime`/`maxDuration`/`dynamic` exports.
+- **Rule:** keep route files thin (just the handler + config); put testable wiring in `lib/` and
+  unit-test it there. Don't export helpers from route modules.
+
+## Background prefetch needs a real worker pool, not setTimeout pumps
+- A prefetch "pump" that does `ensureX(); setTimeout(pump, 150)` does NOT limit concurrency —
+  it launches everything within ~Nx150ms because it never waits for completion. Firing 12
+  concurrent LLM calls stalled them (rate-limit/queue) and alternatives never resolved.
+- **Rule:** for bounded concurrency, make the loader return a Promise and run K async workers that
+  `await` each item off a shared queue/index. Verified by a live Playwright run (alternatives only
+  rendered after switching to a true pool of 2).
+
+## Playwright can drive webkitdirectory uploads
+- To E2E-test a folder-upload UI, `setInputFiles('input[type=file]', '/abs/dir')` with a DIRECTORY
+  path uploads its contents (webkitRelativePath set), even on a `hidden` input. Point it at a tiny
+  fixture dir to keep the live LLM round-trip fast.
+
 ## Execution pacing for large plans
 - 29 micro-tasks × 3 subagents each is impractical. Batching by coherent module (one implementer
   + controller-run spec/quality review per batch) kept review coverage while making real progress.
