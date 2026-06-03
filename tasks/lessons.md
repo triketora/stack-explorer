@@ -52,6 +52,22 @@ Patterns learned while building Stack Explorer, to avoid repeating mistakes.
   path uploads its contents (webkitRelativePath set), even on a `hidden` input. Point it at a tiny
   fixture dir to keep the live LLM round-trip fast.
 
+## Playwright `state:'detached'` races when the element isn't there yet
+- To wait for a loading banner to finish I used `waitForSelector('.progress-banner',
+  {state:'detached'})`. It resolved INSTANTLY and screenshotted the skeleton, because "detached"
+  also matches "not in the DOM yet" — the banner hadn't appeared at call time.
+- **Rule:** don't wait for the disappearance of a not-yet-rendered element. Wait for a POSITIVE
+  post-condition instead (e.g. `waitForSelector('.cluster')` / an enriched-state marker), or wait
+  for the element to be `visible` first, THEN `detached`. Verified: switching the wait to the
+  enriched `.cluster` selector made the screenshots correct.
+
+## System view = dagre, not hand-placed coordinates
+- Repeated hand-drawn SVG mocks had floating arrows / nonsensical ordering. The fix was never
+  better coordinates — it was a layout engine. `dagre` (rankdir LR) computes node positions in
+  dependency order and gives edge `points` that anchor to borders. Render boxes AND edges in ONE
+  SVG coordinate space (viewBox) so they never drift; mixing px-positioned divs with a scaled SVG
+  is what makes arrows miss.
+
 ## Execution pacing for large plans
 - 29 micro-tasks × 3 subagents each is impractical. Batching by coherent module (one implementer
   + controller-run spec/quality review per batch) kept review coverage while making real progress.
