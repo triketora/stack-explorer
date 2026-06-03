@@ -361,7 +361,13 @@ html, body {
   border-radius: 999px;
   padding: 1px 6px;
   background: var(--surface-2);
+  /* subtle by default: revealed on hover / when active so it never crowds the title */
+  opacity: 0;
+  transition: opacity .15s;
+  pointer-events: none;
 }
+.node:hover .alt-count,
+.node.active .alt-count { opacity: 1; }
 
 /* selected / active */
 .node.active {
@@ -627,7 +633,8 @@ html, body {
 /* ---- progressive generation additions ---------------------------------- */
 .node.pending { opacity: .55; }
 .node.pending .glyph { background: var(--surface-2); color: var(--ink-3); }
-.node.pending .alt-count { opacity: .5; }
+.node.pending .alt-count { opacity: 0; }
+.node.pending:hover .alt-count { opacity: .6; }
 
 .progress-banner {
   position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
