@@ -15,6 +15,9 @@ Reading code top-to-bottom doesn't give you that map quickly, and neither does a
 (which is usually aspirational or stale). Stack Explorer reconstructs the map from the
 code itself.
 
+I imagine this tool being used for onboarding to a new team, diligencing a codebase / 
+tech stack (as in an acquisition), prepping for interviews, or just orienting in OSS. 
+
 ## What it does
 
 Pick a folder. In under a second you see a skeleton diagram of the detected stack. Over
@@ -46,13 +49,16 @@ obvious tech is never hallucinated or missed, and if the LLM call fails entirely
 useful diagram still renders from the static pass alone. The model supplies judgment; it
 doesn't supply the facts it's bad at.
 
-**2. The code map is computed, not enumerated by the LLM.**
-Asking a model to list every file belonging to every technology doesn't scale and isn't
-reliable. Instead, per technology the LLM emits a few **path globs**
-(`flask → ["server/app.py", "server/api/**"]`), and the client expands those globs
-against the real, browser-walked file tree to compute every file's mapping
-deterministically. LLM output stays small and stable regardless of repo size, while the
-per-file cross-highlighting stays exact.
+**2. The code map is computed from globs, so it stays complete even though the model
+never sees the whole tree.**
+To keep the call fast, the LLM only gets a capped sample of the file tree (~600 paths) —
+so it *can't* enumerate the files for each technology, and on a large repo it would
+truncate or invent paths anyway. Instead it emits a few **path globs** per technology
+(`flask → ["server/app.py", "server/api/**"]`), and the browser — which holds the full
+walked tree — expands those globs locally. The result is a complete, exact file→tech map
+on a repo of any size, produced by a deterministic matcher (so it can't reference files
+that don't exist), with LLM output that stays a handful of globs regardless of how big
+the codebase is.
 
 **3. Progressive, staged generation instead of one long wait.**
 The naive single call took ~78s on a 14-file repo, almost all of it generating the
