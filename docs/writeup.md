@@ -155,29 +155,3 @@ read" or "this is too slow":
 5. **Splitting dev/test tooling out of the main stack.** Bundlers, linters, test
    frameworks, and CI now live in a separate muted tier so they don't compete with the
    application architecture.
-
----
-
-## Where to fill in / decide
-
-- **Numbers.** Concrete before/after latency, token reduction from deferring alternatives,
-  and a couple of real example repos (sizes, what it correctly/incorrectly surfaced). The
-  ~78s figure is from one synthetic 14-file repo — worth restating with real data.
-- **Visuals.** Screenshots or a short clip of the three views + the compare panel, and a
-  small diagram of the pipeline itself (skeleton → overview → alternatives). Reference
-  mocks live in `reference/mock/screenshots/`.
-- **The "comps for unfamiliar tech" angle.** You called this out as a core motivation; the
-  alternatives panel delivers it, but the writeup could lean into it more with an example.
-- **The ideal (non-hosted) deployment, expanded.** If you want, sketch what the local
-  CLI / IDE / MCP version looks like and what it buys (no third-party hosting, full source
-  available locally). This is your strongest "what I'd do next" note.
-- **Audience / use cases.** Onboarding to a new team, evaluating a codebase (diligence,
-  acquisition), interview prep, or just orienting in OSS. Naming who it's for sharpens the
-  pitch.
-- **Quality / evaluation.** How do you know the output is *good*? Any eval approach, or
-  the honest "spot-checked against repos I know" — reviewers will ask.
-- **Model + cost.** Which model, why (structured-extraction fit, latency, price), and
-  rough cost per analysis. Mention prompt caching on the system prompt if you kept it.
-- **What's deliberately out of scope** (persistence, sharing, mobile, monorepos) — a short
-  YAGNI note signals judgment rather than omission.
-```
