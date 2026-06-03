@@ -6,9 +6,13 @@ import type { AnalyzeRequest } from "@/lib/analyze-contract";
 import { buildSkeleton } from "@/client/skeleton";
 
 export type Stage = "idle" | "reading" | "mapping" | "ready";
-export type AltState = { status: "idle" | "loading" | "ready" | "error"; alts: Alternative[] };
+export type DetailState = {
+  status: "idle" | "loading" | "ready" | "error";
+  rationale: string;
+  alts: Alternative[];
+};
 
-const EMPTY_ALT: AltState = { status: "idle", alts: [] };
+const EMPTY_DETAIL: DetailState = { status: "idle", rationale: "", alts: [] };
 const PREFETCH_CONCURRENCY = 2;
 
 export interface UseAnalysis {
@@ -19,8 +23,8 @@ export interface UseAnalysis {
   fileHandles: Map<string, File>;
   start: (req: AnalyzeRequest, handles: Map<string, File>) => void;
   reset: () => void;
-  altStateFor: (id: string) => AltState;
-  ensureAlts: (tech: Technology, force?: boolean) => void;
+  detailFor: (id: string) => DetailState;
+  ensureDetails: (tech: Technology, force?: boolean) => void;
 }
 
 function contextSummary(a: Analysis): string {
@@ -34,16 +38,16 @@ export function useAnalysis(): UseAnalysis {
   const [elapsedMs, setElapsedMs] = useState(0);
   const [overviewFailed, setOverviewFailed] = useState(false);
   const [fileHandles, setFileHandles] = useState<Map<string, File>>(new Map());
-  const [altsById, setAltsById] = useState<Record<string, AltState>>({});
+  const [detailsById, setDetailsById] = useState<Record<string, DetailState>>({});
 
   const startedAt = useRef<number>(0);
   const analysisRef = useRef<Analysis | null>(null);
   analysisRef.current = analysis;
-  const altsRef = useRef<Record<string, AltState>>({});
+  const detailsRef = useRef<Record<string, DetailState>>({});
 
-  const setAlt = useCallback((id: string, s: AltState) => {
-    altsRef.current = { ...altsRef.current, [id]: s };
-    setAltsById(altsRef.current);
+  const setDetail = useCallback((id: string, s: DetailState) => {
+    detailsRef.current = { ...detailsRef.current, [id]: s };
+    setDetailsById(detailsRef.current);
   }, []);
 
   // elapsed timer while mapping
@@ -54,10 +58,10 @@ export function useAnalysis(): UseAnalysis {
   }, [stage]);
 
   // core loader returns a promise so the prefetch pool can await it
-  const loadAlts = useCallback(async (tech: Technology, force = false): Promise<void> => {
-    const cur = altsRef.current[tech.id] ?? EMPTY_ALT;
+  const loadDetails = useCallback(async (tech: Technology, force = false): Promise<void> => {
+    const cur = detailsRef.current[tech.id] ?? EMPTY_DETAIL;
     if (!force && (cur.status === "ready" || cur.status === "loading")) return;
-    setAlt(tech.id, { status: "loading", alts: [] });
+    setDetail(tech.id, { status: "loading", rationale: tech.rationale ?? "", alts: [] });
     try {
       const a = analysisRef.current;
       const ctx = a ? contextSummary(a) : tech.name;
@@ -65,26 +69,26 @@ export function useAnalysis(): UseAnalysis {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
-          tech: { id: tech.id, name: tech.name, cat: tech.cat, role: tech.rationale },
+          tech: { id: tech.id, name: tech.name, cat: tech.cat, role: tech.rationale || tech.cat },
           contextSummary: ctx,
         }),
       });
       if (!res.ok) throw new Error(String(res.status));
-      const { alts } = (await res.json()) as { alts: Alternative[] };
-      setAlt(tech.id, { status: "ready", alts });
+      const { rationale, alts } = (await res.json()) as { rationale: string; alts: Alternative[] };
+      setDetail(tech.id, { status: "ready", rationale: rationale || tech.rationale || "", alts });
     } catch {
-      setAlt(tech.id, { status: "error", alts: [] });
+      setDetail(tech.id, { status: "error", rationale: tech.rationale ?? "", alts: [] });
     }
-  }, [setAlt]);
+  }, [setDetail]);
 
-  const ensureAlts = useCallback((tech: Technology, force = false) => {
-    void loadAlts(tech, force);
-  }, [loadAlts]);
+  const ensureDetails = useCallback((tech: Technology, force = false) => {
+    void loadDetails(tech, force);
+  }, [loadDetails]);
 
   const start = useCallback((req: AnalyzeRequest, handles: Map<string, File>) => {
     setFileHandles(handles);
-    altsRef.current = {};
-    setAltsById({});
+    detailsRef.current = {};
+    setDetailsById({});
     setOverviewFailed(false);
     setStage("reading");
 
@@ -105,7 +109,7 @@ export function useAnalysis(): UseAnalysis {
         const enriched = (await res.json()) as Analysis;
         setAnalysis(enriched);
         setStage("ready");
-        prefetchAlts(enriched);
+        prefetchDetails(enriched);
       })
       .catch(() => {
         setOverviewFailed(true);
@@ -113,29 +117,29 @@ export function useAnalysis(): UseAnalysis {
       });
 
     // background prefetch: a real worker pool of N that awaits each call
-    function prefetchAlts(a: Analysis) {
+    function prefetchDetails(a: Analysis) {
       const queue = a.tiers.flatMap((t) => t.nodes);
       let i = 0;
       const worker = async () => {
         while (i < queue.length) {
           const tech = queue[i++];
-          await loadAlts(tech);
+          await loadDetails(tech);
         }
       };
       for (let k = 0; k < PREFETCH_CONCURRENCY; k++) void worker();
     }
-  }, [loadAlts]);
+  }, [loadDetails]);
 
   const reset = useCallback(() => {
     setAnalysis(null);
     setStage("idle");
     setOverviewFailed(false);
-    altsRef.current = {};
-    setAltsById({});
+    detailsRef.current = {};
+    setDetailsById({});
     setFileHandles(new Map());
   }, []);
 
-  const altStateFor = useCallback((id: string) => altsById[id] ?? EMPTY_ALT, [altsById]);
+  const detailFor = useCallback((id: string) => detailsById[id] ?? EMPTY_DETAIL, [detailsById]);
 
-  return { analysis, stage, elapsedMs, overviewFailed, fileHandles, start, reset, altStateFor, ensureAlts };
+  return { analysis, stage, elapsedMs, overviewFailed, fileHandles, start, reset, detailFor, ensureDetails };
 }

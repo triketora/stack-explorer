@@ -755,3 +755,34 @@ html, body {
 
 /* keep tiers/nodes above the edge layer so node centers (where edges terminate) stay clickable */
 .tiers { position: relative; z-index: 2; }
+
+/* ===== loading & ux pass (2026-06-03c) =================================== */
+
+/* System view pan/zoom */
+.sys-viewport {
+  position: relative; overflow: hidden; width: 100%;
+  height: calc(100vh - 150px); touch-action: none; cursor: grab; user-select: none;
+}
+.sys-viewport:active { cursor: grabbing; }
+.sys-zoom { transform-origin: 0 0; will-change: transform; }
+.sys-zoom-controls {
+  position: absolute; bottom: 16px; right: 16px; z-index: 10;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.sys-zoom-controls button {
+  width: 30px; height: 30px; border-radius: 7px; border: 1px solid var(--hair);
+  background: var(--surface); color: var(--ink-2); font-size: 16px; line-height: 1;
+  cursor: pointer; box-shadow: var(--shadow);
+}
+.sys-zoom-controls button:hover { color: var(--accent-ink); border-color: var(--accent-edge); }
+
+/* empty placeholder tier (skeleton) */
+.tier-empty { color: var(--ink-3); font-size: 12px; padding: 6px 4px; opacity: .6; }
+
+/* "What's sent?" popover — anchored, no layout reflow */
+.disclosure-anchor { position: relative; display: inline-block; }
+.disclosure-popover {
+  position: absolute; bottom: calc(100% + 8px); left: 0; width: 320px; z-index: 40;
+  background: var(--surface); border: 1px solid var(--hair); box-shadow: var(--shadow-lg);
+  border-radius: 8px; padding: 10px 12px; font-size: 12px; line-height: 1.55; color: var(--ink-2);
+}

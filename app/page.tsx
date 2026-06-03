@@ -13,7 +13,7 @@ import type { DiagramCommon, EdgeControls, EdgeEmphasis } from "@/components/dia
 import { useAnalysis } from "@/client/useAnalysis";
 
 export default function Home() {
-  const { analysis, stage, elapsedMs, overviewFailed, fileHandles, start, reset, altStateFor, ensureAlts } = useAnalysis();
+  const { analysis, stage, elapsedMs, overviewFailed, fileHandles, start, reset, detailFor, ensureDetails } = useAnalysis();
   const [readError, setReadError] = useState<string | null>(null);
 
   const [view, setView] = useState<View>("stack");
@@ -62,7 +62,7 @@ export default function Home() {
   function openNode(n: Technology) {
     setActiveNode((cur) => {
       const next = cur && cur.id === n.id ? null : n;
-      if (next) ensureAlts(next);
+      if (next) ensureDetails(next);
       return next;
     });
   }
@@ -96,7 +96,7 @@ export default function Home() {
 
   const focusId = hoverNodeId ?? selectedId;
   const focusName = focusId ? analysis.tiers.flatMap((t) => t.nodes).find((n) => n.id === focusId)?.name ?? null : null;
-  const activeAlt = activeNode ? altStateFor(activeNode.id) : { status: "idle" as const, alts: [] };
+  const activeDetail = activeNode ? detailFor(activeNode.id) : { status: "idle" as const, rationale: "", alts: [] };
 
   function startTrace() {
     setTraceStep((s) => (s === null ? 0 : null));
@@ -119,13 +119,15 @@ export default function Home() {
 
       <div className="work">
         <div className="canvas-wrap">
-          {stage === "mapping" && <ProgressBanner elapsedMs={elapsedMs} />}
+          {stage === "mapping" && (
+            <ProgressBanner elapsedMs={elapsedMs} techCount={analysis.tiers.flatMap((t) => t.nodes).length} />
+          )}
           {overviewFailed && (
             <div className="notice mono">couldn&apos;t map architecture — showing the detected stack</div>
           )}
 
           {view === "system" ? (
-            <SystemView analysis={analysis} common={common} controls={controls} edgeFocus={edgeFocus} />
+            <SystemView analysis={analysis} common={common} controls={controls} edgeFocus={edgeFocus} title="Systems Architecture" />
           ) : (
             <StackView analysis={analysis} common={common} controls={controls} edgeFocus={edgeFocus}
               canvasRef={canvasRef} nodeEls={nodeEls} bump={bump} />
@@ -145,8 +147,8 @@ export default function Home() {
         </div>
 
         <Drilldown node={activeNode} fileHandles={fileHandles}
-          alts={activeAlt.alts} altStatus={activeAlt.status}
-          onRetryAlts={() => activeNode && ensureAlts(activeNode, true)}
+          rationale={activeDetail.rationale} alts={activeDetail.alts} altStatus={activeDetail.status}
+          onRetryAlts={() => activeNode && ensureDetails(activeNode, true)}
           onClose={() => setActiveNode(null)} />
       </div>
     </div>

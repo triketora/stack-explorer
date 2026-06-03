@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { shouldIgnore, classify, MAX_MANIFEST_BYTES } from "@/client/filter";
+import { supportsFsAccess, pickViaFsAccess } from "@/client/pickDirectory";
 import type { AnalyzeRequest } from "@/lib/analyze-contract";
 
 interface Props {
@@ -12,6 +13,20 @@ interface Props {
 export function FolderPicker({ onPicked, onError }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
+
+  // Prefer the File System Access API (no "Upload N files?" modal); fall back to the input.
+  async function choose() {
+    if (!supportsFsAccess()) { inputRef.current?.click(); return; }
+    setBusy(true);
+    try {
+      const picked = await pickViaFsAccess();
+      if (picked) onPicked(picked.req, picked.handles);
+    } catch (e) {
+      onError(e instanceof Error ? e.message : "could not read folder");
+    } finally {
+      setBusy(false);
+    }
+  }
 
   async function handleFiles(fileList: FileList) {
     setBusy(true);
@@ -42,7 +57,7 @@ export function FolderPicker({ onPicked, onError }: Props) {
   }
 
   return (
-    <div className="drop" onClick={() => inputRef.current?.click()}>
+    <div className="drop" onClick={choose}>
       {busy ? <span>reading files…</span> : <span>drop a folder here, or click to choose a directory ↵</span>}
       <input
         ref={inputRef}

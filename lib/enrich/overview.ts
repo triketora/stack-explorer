@@ -19,7 +19,7 @@ Return ONLY a JSON object with this exact shape:
     { "id": "client"|"api"|"data"|"infra"|"devtest", "idx": "01".."05", "name": string, "desc": string,
       "nodes": [
         { "id": string, "name": string, "cat": string, "glyph": string (<=2 chars),
-          "tags": string[], "rationale": string (why this choice; 1-3 sentences),
+          "tags": string[],
           "pathGlobs": string[],        // globs locating this tech in the tree, e.g. ["server/api/**","server/app.py"]
           "confidence": "detected"|"inferred",
           "group": string,              // sub-cluster label within the tier, e.g. "web / request", "async & jobs", "data access", "persistence", "cache / broker", "object store", "build / deploy", "observability"
@@ -40,7 +40,8 @@ Rules:
 - Put build/lint/test/CI/dev tooling (bundlers, linters, formatters, test frameworks, CI) in the
   "devtest" tier — NOT in client/infra. Give those nodes kind "buildtool".
 - pathGlobs MUST reference real paths/dirs from the provided tree.
-- Do NOT include "alts"/alternatives, a "fileTree", or per-node "files" — those are handled separately.
+- Do NOT include "rationale", "alts"/alternatives, a "fileTree", or per-node "files" — those are
+  handled separately to keep this response fast.
 - Output raw JSON only — no markdown fences, no commentary.`;
 
 export function buildOverviewUserContent(req: OverviewRequest, detected: DetectedTech[]): string {
@@ -63,7 +64,7 @@ const OverviewNodeSchema = z.object({
   cat: z.string(),
   glyph: z.string(),
   tags: z.array(z.string()),
-  rationale: z.string(),
+  rationale: z.string().optional(),   // overview omits this; loaded lazily per tech
   pathGlobs: z.array(z.string()),
   confidence: z.enum(["detected", "inferred"]).optional(),
   group: z.string().optional(),
@@ -110,6 +111,7 @@ export async function enrichOverview(
       return {
         ...n,
         kind,
+        rationale: n.rationale ?? "",   // filled lazily by the per-tech details call
         files: deriveFiles(allPaths, n.pathGlobs),
         alts: [],
         tier: tier.id,

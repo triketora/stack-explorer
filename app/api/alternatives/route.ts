@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { AlternativesRequestSchema } from "@/lib/analyze-contract";
-import { generateAlternatives } from "@/lib/enrich/alternatives";
-import { callAnthropic } from "@/lib/enrich/anthropic";
+import { generateDetails } from "@/lib/enrich/alternatives";
+import { callDetailsModel } from "@/lib/enrich/anthropic";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
@@ -18,9 +18,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "invalid request" }, { status: 400 });
   }
   try {
-    const alts = await generateAlternatives(parsed.data.tech, parsed.data.contextSummary, callAnthropic);
-    return NextResponse.json({ alts });
+    const details = await generateDetails(parsed.data.tech, parsed.data.contextSummary, callDetailsModel);
+    return NextResponse.json(details);   // { rationale, alts }
   } catch {
-    return NextResponse.json({ error: "alternatives_failed" }, { status: 502 });
+    return NextResponse.json({ error: "details_failed" }, { status: 502 });
   }
 }

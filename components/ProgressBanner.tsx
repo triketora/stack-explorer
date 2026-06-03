@@ -1,13 +1,14 @@
 interface Props {
   elapsedMs: number;
+  techCount: number;
 }
 
-export function ProgressBanner({ elapsedMs }: Props) {
+export function ProgressBanner({ elapsedMs, techCount }: Props) {
   const secs = Math.floor(elapsedMs / 1000);
-  const long = secs >= 60;
-  const label = long
+  const detected = techCount > 0 ? `Detected ${techCount} technologies ✓ · ` : "";
+  const label = secs >= 60
     ? "Larger codebase — still working…"
-    : "Mapping architecture & data flow… this usually takes 20–40s";
+    : `${detected}Mapping architecture & data flow…`;
 
   return (
     <div className="progress-banner" role="status" aria-live="polite">

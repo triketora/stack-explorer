@@ -4,6 +4,7 @@ interface Props {
   techCount: number;
   linkCount: number;
   layoutLabel: string;        // "layered" | "system"
+  title: string;              // "Tech Stack" | "Systems Architecture"
   emphasis: EdgeEmphasis;
   legendHot: boolean;         // reciprocal highlight when an edge is hovered
   hasSelection: boolean;
@@ -12,14 +13,14 @@ interface Props {
 }
 
 export function DiagramLegend({
-  techCount, linkCount, layoutLabel, emphasis, legendHot, hasSelection,
+  techCount, linkCount, layoutLabel, title, emphasis, legendHot, hasSelection,
   onDataFlowHover, onDataFlowClick,
 }: Props) {
   const active = emphasis !== "none" || legendHot;
   return (
     <>
       <div className="diagram-head">
-        <h1>System architecture</h1>
+        <h1>{title}</h1>
         <span className="sub">{techCount} technologies · {linkCount} links</span>
       </div>
       <div className="diagram-legend">

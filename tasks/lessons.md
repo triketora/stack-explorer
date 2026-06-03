@@ -84,3 +84,24 @@ Patterns learned while building Stack Explorer, to avoid repeating mistakes.
 - Long-running subagents occasionally hit socket errors mid-run — always independently re-check
   state (files present? committed? tests pass?) before assuming failure; work was usually done but
   the final commit was missing.
+
+## Cut LLM latency: fast structural pass + lazy detail pass
+- The overview was slow because one Sonnet call generated structure AND prose (rationale + alts).
+  Split it: a FAST structural pass on Haiku (tiers/nodes/edges/kind/group, no prose) for first
+  paint, then a per-item Sonnet "details" call (rationale + alternatives) loaded lazily on demand +
+  background-prefetched. Overview dropped ~24s → ~10.5s. Pattern: put only what's needed for the
+  first render in the hot path; defer prose to lazy calls.
+
+## File System Access API avoids the "Upload N files to this site?" modal
+- `<input webkitdirectory>` triggers Chrome's scary "Upload 2654 files?" confirmation.
+  `window.showDirectoryPicker()` (Chromium) opens a normal directory picker with NO upload-count
+  modal, and lets you read entries lazily (only read the files you need; keep handles for preview).
+  Feature-detect and fall back to the webkitdirectory input on Firefox/Safari.
+
+## CSS transform wrapper for pan/zoom (not SVG viewBox)
+- For pan/zoom over an SVG diagram, applying a CSS `transform: translate() scale()` (origin 0 0) to
+  a wrapper DIV keeps cursor math in plain px space (wheel zoom-to-cursor via
+  `tx' = cx - (cx-tx)*k`), far simpler than mutating SVG viewBox. Suppress the click that follows a
+  pan-drag with an `onClickCapture` that checks a "moved" flag, so dragging doesn't fire node clicks.
+
+## Execution pacing for large plans

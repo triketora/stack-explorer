@@ -7,13 +7,14 @@ import { Icon } from "@/components/Icon";
 interface Props {
   node: Technology | null;
   fileHandles: Map<string, File>;
+  rationale: string;
   alts: Alternative[];
   altStatus: "idle" | "loading" | "ready" | "error";
   onRetryAlts: () => void;
   onClose: () => void;
 }
 
-export function Drilldown({ node, fileHandles, alts, altStatus, onRetryAlts, onClose }: Props) {
+export function Drilldown({ node, fileHandles, rationale, alts, altStatus, onRetryAlts, onClose }: Props) {
   const open = !!node;
   const [preview, setPreview] = useState<{ path: string; text: string } | null>(null);
 
@@ -42,7 +43,10 @@ export function Drilldown({ node, fileHandles, alts, altStatus, onRetryAlts, onC
             </div>
 
             <div className="panel-body">
-              <div className="rationale"><span className="lead">why it&apos;s here</span>{node.rationale}</div>
+              <div className="rationale">
+                <span className="lead">why it&apos;s here</span>
+                {rationale || node.rationale || (altStatus === "loading" ? <span className="mono" style={{ color: "var(--ink-3)" }}>analyzing…</span> : "")}
+              </div>
 
               <div className="sec-label">Maps to code</div>
               <div className="files-list">
@@ -71,7 +75,7 @@ export function Drilldown({ node, fileHandles, alts, altStatus, onRetryAlts, onC
                   <span className="alt-name">{node.name}<span className="mono-mini">{node.cat}</span></span>
                   <span className="badge-current">current</span>
                 </div>
-                <div className="alt-blurb">{node.rationale}</div>
+                <div className="alt-blurb">{rationale || node.rationale}</div>
               </div>
 
               {(altStatus === "loading" || altStatus === "idle") && (

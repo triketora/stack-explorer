@@ -25,6 +25,7 @@ export function StackView({ analysis, common, controls, edgeFocus, canvasRef, no
         techCount={techCount}
         linkCount={analysis.edges.length}
         layoutLabel="layered"
+        title="Tech Stack"
         emphasis={controls.emphasis}
         legendHot={controls.legendHot}
         hasSelection={!!common.activeId}

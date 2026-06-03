@@ -82,3 +82,12 @@ Branch: `build-stack-explorer`. Execution mode: subagent-driven (implementer →
 - [x] Fix: raised .tiers z-index so edge SVG (pointer-events:stroke) no longer steals node clicks
 - Verified live: tiers incl muted Dev & Test, pin emphasizes all edges, stack click opens panel,
   code click pins (no panel) + highlights files. 40 tests, build+tsc clean.
+
+## Loading speed & UX pass (2026-06-03c) — COMPLETE
+- [x] Overview: drop rationale (lazy) + Haiku model → ~24s to ~10.5s; details call returns {rationale,alts}
+- [x] Honest ProgressBanner (staged + elapsed, no fake estimate)
+- [x] System view pan/zoom (wheel + drag + +/−/reset, lib/system/zoom.ts)
+- [x] Entry copy fix; "What's sent?" popover (no card reflow)
+- [x] File System Access picker (no "upload N files" modal) + webkitdirectory fallback
+- [x] Titles: Stack="Tech Stack", System="Systems Architecture"; skeleton always shows canonical tiers incl 03 Data
+- Verified live: overview 10.5s, all 5 tiers, zoom controls work, popover no reflow. 44 tests, build+tsc clean.

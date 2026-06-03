@@ -57,7 +57,9 @@ export function Tier({ tier, common }: { tier: TierData; common: DiagramCommon }
         <span className="rule" />
       </div>
 
-      {hasClusters ? (
+      {tier.nodes.length === 0 ? (
+        <div className="tier-empty mono">—</div>
+      ) : hasClusters ? (
         <div className="clusters">
           {order.map((key) => (
             <div className="cluster" key={key || "_"}>
