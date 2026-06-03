@@ -105,3 +105,11 @@ Patterns learned while building Stack Explorer, to avoid repeating mistakes.
   pan-drag with an `onClickCapture` that checks a "moved" flag, so dragging doesn't fire node clicks.
 
 ## Execution pacing for large plans
+## Mask LLM latency by reusing instant local data
+- The wait felt bad because the page showed only a greyed skeleton + spinner during the LLM call.
+  We already had, instantly and for free, the static detection (tech + the exact file that proved
+  each) and a skeleton. Turn that into a "productive wait": a live detection log
+  ("✓ React · client/package.json"), a rotating one-line blurb per detected tech to READ (static
+  registry text), and a shimmer on the skeleton. Pattern: before reaching for streaming or faster
+  models, surface the cheap local signals you already computed — it changes perceived speed a lot
+  with zero added latency.

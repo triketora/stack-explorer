@@ -91,3 +91,9 @@ Branch: `build-stack-explorer`. Execution mode: subagent-driven (implementer →
 - [x] File System Access picker (no "upload N files" modal) + webkitdirectory fallback
 - [x] Titles: Stack="Tech Stack", System="Systems Architecture"; skeleton always shows canonical tiers incl 03 Data
 - Verified live: overview 10.5s, all 5 tiers, zoom controls work, popover no reflow. 44 tests, build+tsc clean.
+
+## Productive loading (2026-06-03d) — COMPLETE
+- [x] Registry: one-line blurb per tech; lib/loading.ts (detectionLog, blurbFor) + tests
+- [x] LoadingPanel: detection log (from parsed files) + rotating "while you wait" blurb + progress
+- [x] Skeleton scan shimmer on .node.pending; replaced ProgressBanner
+- Verified live: panel shows 9 log lines + blurb + 11 shimmering nodes during mapping, gone when ready. 47 tests, build+tsc clean.

@@ -786,3 +786,36 @@ html, body {
   background: var(--surface); border: 1px solid var(--hair); box-shadow: var(--shadow-lg);
   border-radius: 8px; padding: 10px 12px; font-size: 12px; line-height: 1.55; color: var(--ink-2);
 }
+
+/* ===== productive loading (2026-06-03d) ================================== */
+
+/* scan shimmer on greyed skeleton nodes */
+.node.pending { position: relative; overflow: hidden; }
+.node.pending::after {
+  content: ""; position: absolute; top: 0; bottom: 0; width: 45%;
+  background: linear-gradient(90deg, transparent, rgba(90,120,210,0.12), transparent);
+  animation: node-shimmer 1.6s infinite linear; pointer-events: none;
+}
+@keyframes node-shimmer { from { left: -45%; } to { left: 100%; } }
+
+/* loading panel (detection log + blurb) */
+.loading-panel {
+  position: absolute; top: 16px; right: 16px; z-index: 30; width: 300px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.lp-section {
+  background: var(--surface); border: 1px solid var(--hair); border-radius: 10px;
+  padding: 10px 12px; box-shadow: var(--shadow);
+}
+.lp-head { font-size: 10px; color: var(--ink-3); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 6px; }
+.lp-log { font-family: var(--mono); font-size: 11px; }
+.lp-line { margin: 3px 0; animation: lp-fadeup .3s both; }
+@keyframes lp-fadeup { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
+.lp-ok { color: #1a8497; }
+.lp-src { color: var(--ink-3); }
+.lp-mapping { color: var(--accent-ink); }
+.lp-elapsed { color: var(--ink-3); }
+.lp-bar { height: 4px; border-radius: 2px; background: var(--hair-2); overflow: hidden; margin-top: 8px; }
+.lp-bar > i { display: block; height: 100%; width: 40%; background: var(--accent); border-radius: 2px; animation: lp-indeterminate 1.1s infinite ease-in-out; }
+@keyframes lp-indeterminate { 0% { margin-left: -40%; } 100% { margin-left: 100%; } }
+.lp-blurb-text { font-size: 12.5px; line-height: 1.5; color: var(--ink-2); }

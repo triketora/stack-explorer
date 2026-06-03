@@ -8,7 +8,7 @@ import { StackView } from "@/components/StackView";
 import { SystemView } from "@/components/SystemView";
 import { Drilldown } from "@/components/Drilldown";
 import { CodeOverlay } from "@/components/CodeOverlay";
-import { ProgressBanner } from "@/components/ProgressBanner";
+import { LoadingPanel } from "@/components/LoadingPanel";
 import type { DiagramCommon, EdgeControls, EdgeEmphasis } from "@/components/diagram-types";
 import { useAnalysis } from "@/client/useAnalysis";
 
@@ -119,9 +119,7 @@ export default function Home() {
 
       <div className="work">
         <div className="canvas-wrap">
-          {stage === "mapping" && (
-            <ProgressBanner elapsedMs={elapsedMs} techCount={analysis.tiers.flatMap((t) => t.nodes).length} />
-          )}
+          {stage === "mapping" && <LoadingPanel analysis={analysis} elapsedMs={elapsedMs} />}
           {overviewFailed && (
             <div className="notice mono">couldn&apos;t map architecture — showing the detected stack</div>
           )}
