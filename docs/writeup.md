@@ -155,3 +155,32 @@ read" or "this is too slow":
 5. **Splitting dev/test tooling out of the main stack.** Bundlers, linters, test
    frameworks, and CI now live in a separate muted tier so they don't compete with the
    application architecture.
+
+## How I'd extend this
+
+- **Reclaim analysis quality at speed.** Pushing loading times down — faster models,
+  shorter prompts — has cost some analysis quality. I'd fine-tune the prompts and tune the
+  speed/quality tradeoff per stage (e.g. a stronger model for the overview, cheaper ones
+  for the per-tech alternatives) instead of trading quality away uniformly.
+- **Clean up the System diagram.** The runtime graphs still come out messy on real repos —
+  crossing edges, awkward grouping. Better layout, edge routing, and cluster boundaries
+  would make them as readable as the Stack view.
+- **Surface significant technical decisions and tradeoffs.** Go beyond "what's the stack"
+  to call out the consequential choices in the codebase and their tradeoffs — the things a
+  staff engineer would flag reading it for the first time.
+- **Re-architect around data security / local use.** The big one (see Tradeoffs). Run it
+  locally so the codebase never leaves the machine; or, if it stays a hosted site, let
+  people bring their own model — their existing Claude/Codex subscription, or even a
+  locally-run open-weights model — so the analysis happens through a channel they already
+  trust with their code.
+- **Export and share.** Save an analysis to an image/link/file rather than it being purely
+  ephemeral, so it can be handed to a teammate or dropped into a doc.
+- **Stretch: infer the stack from a running site.** See how much of a stack can be
+  reconstructed just by inspecting a live website's shipped code — bundles, response
+  headers, network calls — and build the same diagram from the outside in, with no repo at
+  all.
+
+---
+
+*Time spent: ~2.5 hours of coding (split over a couple of sessions), plus about another
+half hour on the writeup and demo.*
