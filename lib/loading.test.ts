@@ -18,10 +18,10 @@ const analysis: Analysis = {
 };
 
 describe("detectionLog", () => {
-  it("returns one entry per detected node with its first source; skips empty tiers", () => {
+  it("returns one entry per detected node with its first source + rationale; skips empty tiers", () => {
     expect(detectionLog(analysis)).toEqual([
-      { id: "react", name: "React", source: "client/package.json" },
-      { id: "docker", name: "Docker", source: "Dockerfile" },
+      { id: "react", name: "React", source: "client/package.json", rationale: "" },
+      { id: "docker", name: "Docker", source: "Dockerfile", rationale: "" },
     ]);
   });
 });

@@ -113,3 +113,16 @@ Patterns learned while building Stack Explorer, to avoid repeating mistakes.
   registry text), and a shimmer on the skeleton. Pattern: before reaching for streaming or faster
   models, surface the cheap local signals you already computed — it changes perceived speed a lot
   with zero added latency.
+
+## Don't `rm -rf .next` while `next dev` is running
+- Running `rm -rf .next && npm run build` (a verification gate) while a `next dev` server is still
+  up nukes the dev server's chunks → the page then 404s on `/_next/static/...main-app.js`/`layout.css`
+  and React never hydrates (clicks do nothing). Symptom in Playwright: every interaction times out;
+  console shows 404s for _next chunks. Fix: kill the dev server before a production build, or build
+  in a separate checkout. Restarting `next dev` regenerates `.next` and recovers.
+
+## Serve large baked JSON from public/, don't dynamic-import it
+- `import("@/lib/demo/big.json")` (1.3MB) failed with a 404 on the generated chunk under turbopack
+  dev, and would also bloat the JS graph. Put big static snapshots in `public/` and `fetch()` them
+  on demand — naturally lazy, no bundler chunk, tiny JS bundle. Node tests then read the file via
+  `fs` (no fetch/server needed).

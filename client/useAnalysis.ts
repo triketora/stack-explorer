@@ -4,6 +4,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { Analysis, Alternative, Technology } from "@/lib/types";
 import type { AnalyzeRequest } from "@/lib/analyze-contract";
 import { buildSkeleton } from "@/client/skeleton";
+import type { DemoEntry } from "@/lib/demo";
+
+const DEMO_REPLAY_MS = 3000;
 
 export type Stage = "idle" | "reading" | "mapping" | "ready";
 export type DetailState = {
@@ -22,6 +25,7 @@ export interface UseAnalysis {
   overviewFailed: boolean;
   fileHandles: Map<string, File>;
   start: (req: AnalyzeRequest, handles: Map<string, File>) => void;
+  loadDemo: (demo: DemoEntry) => void;
   reset: () => void;
   detailFor: (id: string) => DetailState;
   ensureDetails: (tech: Technology, force?: boolean) => void;
@@ -130,6 +134,41 @@ export function useAnalysis(): UseAnalysis {
     }
   }, [loadDetails]);
 
+  // One-click demo: replay a brief loading sequence, then reveal the pre-baked snapshot.
+  const loadDemo = useCallback((demo: DemoEntry) => {
+    setFileHandles(new Map());
+    setOverviewFailed(false);
+    setStage("reading");
+    void demo.load().then((full) => {
+      // pre-fill the details cache so compare panels are instant after the reveal
+      const details: Record<string, DetailState> = {};
+      for (const tier of full.tiers) {
+        for (const n of tier.nodes) {
+          details[n.id] = { status: "ready", rationale: n.rationale ?? "", alts: n.alts ?? [] };
+        }
+      }
+      detailsRef.current = details;
+      setDetailsById(details);
+
+      // skeleton-ified view (pending nodes, no edges/trace) to play the loading UI
+      const skeleton: Analysis = {
+        ...full,
+        edges: [],
+        trace: [],
+        tiers: full.tiers.map((t) => ({ ...t, nodes: t.nodes.map((n) => ({ ...n, pending: true })) })),
+      };
+      setAnalysis(skeleton);
+      startedAt.current = Date.now();
+      setElapsedMs(0);
+      setStage("mapping");
+
+      setTimeout(() => {
+        setAnalysis(full);
+        setStage("ready");
+      }, DEMO_REPLAY_MS);
+    }).catch(() => setOverviewFailed(true));
+  }, []);
+
   const reset = useCallback(() => {
     setAnalysis(null);
     setStage("idle");
@@ -141,5 +180,5 @@ export function useAnalysis(): UseAnalysis {
 
   const detailFor = useCallback((id: string) => detailsById[id] ?? EMPTY_DETAIL, [detailsById]);
 
-  return { analysis, stage, elapsedMs, overviewFailed, fileHandles, start, reset, detailFor, ensureDetails };
+  return { analysis, stage, elapsedMs, overviewFailed, fileHandles, start, loadDemo, reset, detailFor, ensureDetails };
 }

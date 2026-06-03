@@ -3,14 +3,16 @@
 import { useState } from "react";
 import { FolderPicker } from "@/components/FolderPicker";
 import type { AnalyzeRequest } from "@/lib/analyze-contract";
+import { DEMOS, type DemoEntry } from "@/lib/demo";
 
 interface Props {
   onPicked: (req: AnalyzeRequest, files: Map<string, File>) => void;
+  onDemo: (demo: DemoEntry) => void;
   onError: (message: string) => void;
   error: string | null;
 }
 
-export function EntryScreen({ onPicked, onError, error }: Props) {
+export function EntryScreen({ onPicked, onDemo, onError, error }: Props) {
   const [showDetail, setShowDetail] = useState(false);
   return (
     <div className="entry">
@@ -20,6 +22,15 @@ export function EntryScreen({ onPicked, onError, error }: Props) {
         <p>Select a project directory and Stack Explorer maps its tech stack and systems architecture.</p>
         <FolderPicker onPicked={onPicked} onError={onError} />
         {error && <p style={{ color: "crimson", fontSize: 13 }}>{error}</p>}
+
+        <div className="samples">
+          <span className="samples-label mono">or explore a sample</span>
+          {DEMOS.map((d) => (
+            <button key={d.slug} type="button" className="sample-chip" onClick={() => onDemo(d)}>
+              {d.label}
+            </button>
+          ))}
+        </div>
 
         <div className="disclosure">
           <span><strong>Your code mostly stays on your device.</strong></span>{" "}

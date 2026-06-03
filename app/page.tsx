@@ -13,7 +13,7 @@ import type { DiagramCommon, EdgeControls, EdgeEmphasis } from "@/components/dia
 import { useAnalysis } from "@/client/useAnalysis";
 
 export default function Home() {
-  const { analysis, stage, elapsedMs, overviewFailed, fileHandles, start, reset, detailFor, ensureDetails } = useAnalysis();
+  const { analysis, stage, elapsedMs, overviewFailed, fileHandles, start, loadDemo, reset, detailFor, ensureDetails } = useAnalysis();
   const [readError, setReadError] = useState<string | null>(null);
 
   const [view, setView] = useState<View>("stack");
@@ -53,6 +53,7 @@ export default function Home() {
   if (!analysis) {
     return <EntryScreen
       onPicked={(req, handles) => { setReadError(null); setView("stack"); setActiveNode(null); start(req, handles); }}
+      onDemo={(demo) => { setReadError(null); setView("stack"); setActiveNode(null); loadDemo(demo); }}
       onError={setReadError} error={readError} />;
   }
 

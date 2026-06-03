@@ -97,3 +97,10 @@ Branch: `build-stack-explorer`. Execution mode: subagent-driven (implementer →
 - [x] LoadingPanel: detection log (from parsed files) + rotating "while you wait" blurb + progress
 - [x] Skeleton scan shimmer on .node.pending; replaced ProgressBanner
 - Verified live: panel shows 9 log lines + blurb + 11 shimmering nodes during mapping, gone when ready. 47 tests, build+tsc clean.
+
+## One-click demo (2026-06-03e) — COMPLETE
+- [x] Bake tooling: scripts/bake-demo.mjs (walk → /api/overview → /api/alternatives per tech)
+- [x] Baked Mastodon snapshot → public/demo/mastodon.json (21 techs, 16 edges, full rationale+alts)
+- [x] lib/demo/index.ts (fetch from /public); useAnalysis.loadDemo (skeleton replay ~3s → reveal, prefill details)
+- [x] EntryScreen sample chip; LoadingPanel blurb fallback to baked rationale (lib/loading detectionLog +rationale)
+- Verified live: chip → loading replay (log+blurb) → reveal Tech Stack 21 techs; System 9 nodes/13 edges; panel alts instant. 49 tests, build+tsc clean.

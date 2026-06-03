@@ -11,10 +11,17 @@ interface Props {
 
 const LOG_CAP = 8;
 
+function trim(s: string, n = 160): string {
+  if (!s) return "";
+  return s.length > n ? s.slice(0, n).replace(/\s+\S*$/, "") + "…" : s;
+}
+
 export function LoadingPanel({ analysis, elapsedMs }: Props) {
   const log = useMemo(() => detectionLog(analysis), [analysis]);
   const blurbs = useMemo(
-    () => log.map((e) => ({ name: e.name, blurb: blurbFor(e.id) })).filter((e): e is { name: string; blurb: string } => !!e.blurb),
+    () => log
+      .map((e) => ({ name: e.name, blurb: blurbFor(e.id) ?? trim(e.rationale) }))
+      .filter((e): e is { name: string; blurb: string } => !!e.blurb),
     [log],
   );
 
