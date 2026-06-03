@@ -1,30 +1,21 @@
 "use client";
 
-import { useState } from "react";
 import type { Technology, Alternative } from "@/lib/types";
 import { Icon } from "@/components/Icon";
 
 interface Props {
   node: Technology | null;
-  fileHandles: Map<string, File>;
   rationale: string;
   alts: Alternative[];
   altStatus: "idle" | "loading" | "ready" | "error";
+  fileCount: number;
   onRetryAlts: () => void;
+  onShowInCode: () => void;
   onClose: () => void;
 }
 
-export function Drilldown({ node, fileHandles, rationale, alts, altStatus, onRetryAlts, onClose }: Props) {
+export function Drilldown({ node, rationale, alts, altStatus, fileCount, onRetryAlts, onShowInCode, onClose }: Props) {
   const open = !!node;
-  const [preview, setPreview] = useState<{ path: string; text: string } | null>(null);
-
-  async function openFile(path: string) {
-    const clean = path.replace(/\/$/, "");
-    const handle = fileHandles.get(clean);
-    if (!handle) { setPreview({ path: clean, text: "(file contents unavailable)" }); return; }
-    const text = await handle.text();
-    setPreview({ path: clean, text: text.slice(0, 20000) });
-  }
 
   return (
     <>
@@ -48,24 +39,11 @@ export function Drilldown({ node, fileHandles, rationale, alts, altStatus, onRet
                 {rationale || node.rationale || (altStatus === "loading" ? <span className="mono" style={{ color: "var(--ink-3)" }}>analyzing…</span> : "")}
               </div>
 
-              <div className="sec-label">Maps to code</div>
-              <div className="files-list">
-                {node.files.map((f) => {
-                  const dir = f.endsWith("/");
-                  return (
-                    <div key={f} className="file-line" onClick={() => !dir && openFile(f)}>
-                      <Icon name={dir ? "folder" : "file"} style={{ width: 14, height: 14 }} />
-                      <span>{f}</span>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {preview && (
-                <pre className="file-preview" style={{ maxHeight: 220, overflow: "auto", fontFamily: "var(--mono)", fontSize: 12, background: "var(--surface-2)", padding: 10, borderRadius: 6 }}>
-                  <div className="sec-label">{preview.path}</div>
-                  {preview.text}
-                </pre>
+              {fileCount > 0 && (
+                <button type="button" className="show-in-code" onClick={onShowInCode}>
+                  <Icon name="map" style={{ width: 14, height: 14 }} />
+                  See where it&apos;s used in the Code map ({fileCount})
+                </button>
               )}
 
               <div className="sec-label">Alternatives &amp; tradeoffs</div>

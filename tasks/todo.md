@@ -104,3 +104,9 @@ Branch: `build-stack-explorer`. Execution mode: subagent-driven (implementer →
 - [x] lib/demo/index.ts (fetch from /public); useAnalysis.loadDemo (skeleton replay ~3s → reveal, prefill details)
 - [x] EntryScreen sample chip; LoadingPanel blurb fallback to baked rationale (lib/loading detectionLog +rationale)
 - Verified live: chip → loading replay (log+blurb) → reveal Tech Stack 21 techs; System 9 nodes/13 edges; panel alts instant. 49 tests, build+tsc clean.
+
+## Compare panel cleanup (2026-06-03f) — COMPLETE
+- [x] Removed "Maps to code" file list + local preview from Drilldown (freed space)
+- [x] Added "See where it's used in the Code map (N)" link → switches to Code view + pins tech (files highlighted)
+- [x] Dropped per-view pin-clear effect so the pin survives the switch
+- Verified live (demo): panel has no file list; link → Code view, panel closed, 6 files highlighted. 49 tests, build+tsc clean.

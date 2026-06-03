@@ -13,7 +13,7 @@ import type { DiagramCommon, EdgeControls, EdgeEmphasis } from "@/components/dia
 import { useAnalysis } from "@/client/useAnalysis";
 
 export default function Home() {
-  const { analysis, stage, elapsedMs, overviewFailed, fileHandles, start, loadDemo, reset, detailFor, ensureDetails } = useAnalysis();
+  const { analysis, stage, elapsedMs, overviewFailed, start, loadDemo, reset, detailFor, ensureDetails } = useAnalysis();
   const [readError, setReadError] = useState<string | null>(null);
 
   const [view, setView] = useState<View>("stack");
@@ -35,7 +35,6 @@ export default function Home() {
   }, []);
 
   useEffect(() => { setBump((b) => b + 1); }, [view, analysis]);
-  useEffect(() => { setPinnedNodeId(null); }, [view]);   // selection is per-view (Code view)
 
   useEffect(() => {
     const h = (e: KeyboardEvent) => { if (e.key === "Escape") { setActiveNode(null); setTraceStep(null); } };
@@ -145,9 +144,11 @@ export default function Home() {
             onClickFile={onClickFile} />
         </div>
 
-        <Drilldown node={activeNode} fileHandles={fileHandles}
+        <Drilldown node={activeNode}
           rationale={activeDetail.rationale} alts={activeDetail.alts} altStatus={activeDetail.status}
+          fileCount={activeNode?.files.length ?? 0}
           onRetryAlts={() => activeNode && ensureDetails(activeNode, true)}
+          onShowInCode={() => { if (activeNode) { setPinnedNodeId(activeNode.id); setActiveNode(null); setView("code"); } }}
           onClose={() => setActiveNode(null)} />
       </div>
     </div>
