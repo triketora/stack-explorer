@@ -53,7 +53,6 @@ export function Drilldown({ node, rationale, alts, altStatus, fileCount, onRetry
                   <span className="alt-name">{node.name}<span className="mono-mini">{node.cat}</span></span>
                   <span className="badge-current">current</span>
                 </div>
-                <div className="alt-blurb">{rationale || node.rationale}</div>
               </div>
 
               {(altStatus === "loading" || altStatus === "idle") && (
