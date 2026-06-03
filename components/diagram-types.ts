@@ -1,5 +1,15 @@
 import type { Technology } from "@/lib/types";
 
+export type EdgeEmphasis = "none" | "hover" | "pinned";
+
+export interface EdgeControls {
+  emphasis: EdgeEmphasis;
+  legendHot: boolean;
+  onDataFlowHover: (on: boolean) => void;
+  onDataFlowClick: () => void;
+  onEdgeHover: (on: boolean) => void;
+}
+
 export interface DiagramCommon {
   activeId: string | null;
   fileHits: Set<string> | null;   // node ids highlighted from a hovered file

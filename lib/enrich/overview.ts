@@ -21,7 +21,9 @@ Return ONLY a JSON object with this exact shape:
         { "id": string, "name": string, "cat": string, "glyph": string (<=2 chars),
           "tags": string[], "rationale": string (why this choice; 1-3 sentences),
           "pathGlobs": string[],        // globs locating this tech in the tree, e.g. ["server/api/**","server/app.py"]
-          "confidence": "detected"|"inferred"
+          "confidence": "detected"|"inferred",
+          "group": string,              // sub-cluster label within the tier, e.g. "web / request", "async & jobs", "data access", "persistence", "cache / broker", "object store", "build / deploy", "observability"
+          "kind": "client"|"server"|"service"|"datastore"|"queue"|"worker"|"external"|"buildtool"  // runtime role; use "buildtool" for build/dev-only tools (bundlers, linters, CI, styling, routing libs)
         }
       ]
     }
@@ -59,6 +61,11 @@ const OverviewNodeSchema = z.object({
   rationale: z.string(),
   pathGlobs: z.array(z.string()),
   confidence: z.enum(["detected", "inferred"]).optional(),
+  group: z.string().optional(),
+  // accept "buildtool" from the model but treat it as "no runtime kind" downstream
+  kind: z.enum([
+    "client", "server", "service", "datastore", "queue", "worker", "external", "buildtool",
+  ]).optional(),
 });
 const OverviewTierSchema = z.object({
   id: z.string(),
@@ -93,8 +100,11 @@ export async function enrichOverview(
     ...tier,
     nodes: tier.nodes.map((n) => {
       techGlobs[n.id] = n.pathGlobs;
+      // "buildtool" is not a runtime kind — drop it so the System view excludes the node
+      const kind = n.kind === "buildtool" ? undefined : n.kind;
       return {
         ...n,
+        kind,
         files: deriveFiles(allPaths, n.pathGlobs),
         alts: [],
         tier: tier.id,

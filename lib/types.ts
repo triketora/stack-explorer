@@ -22,7 +22,13 @@ export const TechnologySchema = z.object({
   alts: z.array(AlternativeSchema),
   tier: z.string().optional(),
   pending: z.boolean().optional(),   // UI-only: skeleton/not-yet-enriched styling
+  group: z.string().optional(),      // Stack sub-cluster label, e.g. "async & jobs"
+  kind: z.enum([
+    "client", "server", "service", "datastore", "queue", "worker", "external",
+  ]).optional(),                      // System role; absent ⇒ excluded from System view
 });
+
+export type TechKind = NonNullable<z.infer<typeof TechnologySchema>["kind"]>;
 
 export const TierSchema = z.object({
   id: z.string(),

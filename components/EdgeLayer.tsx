@@ -1,18 +1,21 @@
 "use client";
 
 import { useState, useLayoutEffect, useEffect, useCallback, type RefObject } from "react";
+import type { EdgeEmphasis } from "@/components/diagram-types";
 
 interface Props {
   canvasRef: RefObject<HTMLDivElement | null>;
   nodeEls: RefObject<Map<string, HTMLElement>>;
   edges: [string, string][];
   activeId: string | null;
+  emphasis: EdgeEmphasis;
+  onEdgeHover: (on: boolean) => void;
   bump: number;
 }
 
 interface EdgePath { id: string; d: string; a: string; b: string; ax: number; ay: number; bx: number; by: number; }
 
-export function EdgeLayer({ canvasRef, nodeEls, edges, activeId, bump }: Props) {
+export function EdgeLayer({ canvasRef, nodeEls, edges, activeId, emphasis, onEdgeHover, bump }: Props) {
   const [paths, setPaths] = useState<EdgePath[]>([]);
 
   const compute = useCallback(() => {
@@ -52,13 +55,25 @@ export function EdgeLayer({ canvasRef, nodeEls, edges, activeId, bump }: Props) 
     return () => { window.removeEventListener("resize", onR); ro.disconnect(); };
   }, [compute, canvasRef]);
 
+  const emphasizeAll = emphasis !== "none";
+
+  function classFor(p: EdgePath): string {
+    if (activeId) return p.a === activeId || p.b === activeId ? "hot" : "dim";
+    return emphasizeAll ? "all" : "";
+  }
+
   return (
     <svg className="edge-layer">
-      {paths.map((p) => {
-        const hot = !!activeId && (p.a === activeId || p.b === activeId);
-        const dim = !!activeId && !hot;
-        return <path key={p.id} d={p.d} className={hot ? "hot" : dim ? "dim" : ""} />;
-      })}
+      {paths.map((p) => (
+        <path
+          key={p.id}
+          d={p.d}
+          className={classFor(p)}
+          style={{ pointerEvents: "stroke" }}
+          onMouseEnter={() => onEdgeHover(true)}
+          onMouseLeave={() => onEdgeHover(false)}
+        />
+      ))}
       {paths.map((p) => {
         const hot = !!activeId && (p.a === activeId || p.b === activeId);
         if (activeId && !hot) return null;

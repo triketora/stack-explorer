@@ -1,18 +1,18 @@
 import type { Analysis } from "@/lib/types";
 import { Icon } from "@/components/Icon";
 
-type Mode = "arch" | "code";
+export type View = "stack" | "system" | "code";
 
 interface Props {
   analysis: Analysis;
-  mode: Mode;
-  onMode: (m: Mode) => void;
+  view: View;
+  onView: (v: View) => void;
   onTrace: () => void;
   tracing: boolean;
   onReset: () => void;
 }
 
-export function TopBar({ analysis, mode, onMode, onTrace, tracing, onReset }: Props) {
+export function TopBar({ analysis, view, onView, onTrace, tracing, onReset }: Props) {
   return (
     <header className="topbar">
       <div className="brand"><span className="mark" /> Stack Explorer</div>
@@ -23,11 +23,12 @@ export function TopBar({ analysis, mode, onMode, onTrace, tracing, onReset }: Pr
         </span>
       </div>
       <div className="spacer" />
-      <div className="seg" role="group" aria-label="View mode">
-        <button aria-pressed={mode === "arch"} onClick={() => onMode("arch")}><Icon name="layers" /> Architecture</button>
-        <button aria-pressed={mode === "code"} onClick={() => onMode("code")}><Icon name="map" /> Codebase map</button>
+      <div className="seg" role="group" aria-label="View">
+        <button aria-pressed={view === "stack"} onClick={() => onView("stack")}><Icon name="layers" /> Stack</button>
+        <button aria-pressed={view === "system"} onClick={() => onView("system")}><Icon name="graph" /> System</button>
+        <button aria-pressed={view === "code"} onClick={() => onView("code")}><Icon name="map" /> Code</button>
       </div>
-      {mode === "arch" && analysis.trace.length > 0 && (
+      {view === "stack" && analysis.trace.length > 0 && (
         <button className="btn-ghost" onClick={onTrace} aria-pressed={tracing}>
           <Icon name="play" /> {tracing ? "Stop trace" : "Trace a request"}
         </button>

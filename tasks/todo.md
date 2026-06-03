@@ -64,3 +64,12 @@ Branch: `build-stack-explorer`. Execution mode: subagent-driven (implementer →
 - [x] Staged orchestration hook (client/useAnalysis.ts) + ProgressBanner + pending styling + alt states
 - [x] Removed old single-call /api/analyze + enrich/{prompt,index}
 - Verified live: overview ~78s → ~24s; skeleton <1s; alternatives ~14s (prefetched). 31 tests, build clean, tsc clean.
+
+## Diagram views & controls (2026-06-03) — COMPLETE
+- [x] Stack view sub-clusters (Technology.group) — labeled groups per tier incl. observability
+- [x] System view (new): dagre L→R topology, kind-tinted nodes, border-anchored arrows, async dashed, external cloud
+- [x] Technology.kind (client/server/service/datastore/queue/worker/external); buildtool excluded from System
+- [x] Code view = slide-over overlay (no diagram resize / no jump)
+- [x] Interactive "data flow" legend (hover-all, click-pin, reciprocal edge→label); "selected path" → "selected connections" (only when selected)
+- [x] Entry data-disclosure note (expandable "What's sent?")
+- Verified live: Stack 8 clusters/16 links, System 9 nodes/10 edges, code overlay width unchanged, disclosure expands. 35 tests, build+tsc clean.

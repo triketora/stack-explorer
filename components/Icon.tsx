@@ -7,6 +7,7 @@ const PATHS: Record<string, string> = {
   map: "M3 5l5-2 4 2 5-2v12l-5 2-4-2-5 2z M8 3v14 M12 5v14",
   code: "M7 6l-4 4 4 4 M13 6l4 4-4 4",
   play: "M6 4l10 6-10 6z",
+  graph: "M3 7h5v6H3z M12 7h5v6h-5z M8 10h4",
 };
 
 interface IconProps {
